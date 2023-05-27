@@ -20,7 +20,6 @@ interface Game {
   image: string;
 }
 import { queryBuilder } from '../lib/planetscale';
-import Search from './search';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,13 +65,8 @@ export async function UsersTable({ games }: { games: Game[] }) {
   );
 };
 
-export default async function GamesTable({
-  searchParams
-}: {
-  searchParams: any
-}) {
+export default async function GamesTable({}) {
   const session = await getServerSession();
-
   if(!session?.user) {
     return (
       <>
