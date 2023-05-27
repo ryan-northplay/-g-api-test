@@ -5,8 +5,15 @@ It includes a standalone html client, however all codes are non refactored/messy
 
 Idea was to transition the standalone client into this next.js system just don't have much more use for it currently cause of the simplicity of the API service that makes small room for errors (I hope).
 
+## Demo
+Check [https://g-api-test.vercel.app/](https://g-api-test.vercel.app/)
 
-# Install
+Admin login:
+`testAdmin`
+`testPassword`
+`testSecurekey`
+
+## Install
 
 ### 1. Register free database on planetscale/cloudflare: [https://planetscale.com](https://planetscale.com).
 
