@@ -1,0 +1,419 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <style>
+    .formlabel{
+     width:225px;
+     display:inline-block;
+     font-size: 12px;
+    }
+    input[type="text" i] {
+        font-family: monospace;
+        width: 300px;
+        font-size: 13px;
+    }
+    .hidden {
+      display: none;
+    }
+    </style></head>
+    
+    <body>
+        <div id="responseDiv" class="hidden">
+        <h3>API Response</h3>
+        <form> 
+        <textarea id="jsonInput" placeholder="api response" rows="7" cols="60"></textarea>
+        <textarea id="apiUrlshow" placeholder="api URL" rows="7" cols="40"></textarea><br>
+        <button onclick="displayJSON()">Beautify Response (optional)</button>
+        <button onclick="openUrl()">Open URL in New Window (cors error)</button>
+    
+        </form></div>
+        <pre id="jsonOutput"></pre>
+    
+        <script>
+            function openUrl() {
+                event.preventDefault();
+    
+                var urlWindow;
+                urlWindow = document.getElementById('apiUrlshow').value;
+                urlWindow = decodeURI(urlWindow);
+                console.log(urlWindow);
+                window.open(urlWindow, '_blank');   
+            }
+            function displayJSON() {
+                event.preventDefault();
+    
+                var jsonInput = document.getElementById("jsonInput").value;
+                var jsonOutput = document.getElementById("jsonOutput");
+                try {
+                    var jsonObj = JSON.parse(jsonInput);
+                    jsonOutput.innerHTML = JSON.stringify(jsonObj, null, 2);
+                } catch (e) {
+                    jsonOutput.innerHTML = "Invalid JSON";
+                }
+            }
+        </script>
+    
+        <h3>Gapi Settings</h3>
+        
+            <label class="formlabel" for="gapi_api_url">API URL</label>
+            <input type="text" id="gapi_api_url" name="gapi_api_url" value="https://play.gapi.lol/api/games/get/"><br>
+        
+        <form onsubmit="saveCookie('gapi_apikey', event)">
+            <label class="formlabel" for="gapi_apikey_input">API KEY</label>
+            <input type="text" id="gapi_apikey_input" name="gapi_apikey_input">
+            <input type="submit" value="Save to cookie (optional)">
+        </form>
+        <form>
+            <label class="formlabel" for="gapi_corsproxy">CORS PROXY (leave empty to not use):</label>
+            <input type="text" id="gapi_corsproxy" value="https://cors-tube.vercel.app/?url=" name="gapi_corsproxy">
+        </form>
+    
+        <form onsubmit="saveCookie('gapi_parentid', event)">
+            <label class="formlabel" for="gapi_parentid_input">PARENTID (Hall ID):</label>
+            <input type="text" id="gapi_parentid_input" name="gapi_parentid_input">
+            <input type="submit" value="Save to cookie (optional)">
+        </form>
+    
+        <form onsubmit="saveCookie('gapi_public_apikey', event)">
+            <label class="formlabel" for="gapi_public_apikey_input">PUBLIC API ID (Used in game URL):</label>
+            <input type="text" id="gapi_public_apikey_input" name="gapi_public_apikey_input">
+            <input type="submit" value="Save to cookie (optional)">
+        </form>
+    
+        <script>
+            function saveCookie(cookieId, event) {
+                event.preventDefault();
+                var cookieInputValue = document.getElementById((cookieId + "_input")).value;
+                if(!cookieInputValue) {
+                    alert("Input cannot be empty");
+                    return;
+                }
+                document.cookie = cookieId + "=" + cookieInputValue;
+                alert("Cookie saved.");
+            }
+            function getCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for(var i=0;i < ca.length;i++) {
+                    var c = ca[i];
+                    while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                }
+                return null;
+            }
+    
+            
+        var gapiapikeyCookie = getCookie("gapi_apikey");
+        if (gapiapikeyCookie) {
+            document.getElementById("gapi_apikey_input").value = gapiapikeyCookie;
+        }
+        var gapipublickeyCookie = getCookie("gapi_public_apikey");
+        if (gapipublickeyCookie) {
+            document.getElementById("gapi_public_apikey_input").value = gapipublickeyCookie;
+        }
+        var gapiparentidCookie = getCookie("gapi_parentid");
+        if (gapiparentidCookie) {
+            document.getElementById("gapi_parentid_input").value = gapiparentidCookie;
+        }
+    </script>
+    
+    
+    <h3>Create/Update Player</h3>
+    <button onclick="generatePlayerId(32)">Random player id + callback key</button>
+    <button onclick="mockbinCallbackUrl(1000)">1000 credit callback URL</button>
+    <button onclick="mockbinCallbackUrl(25)">25 credit callback URL</button>
+    
+    
+    <form id="inituserform" method="post" name="inituserform">
+        <label class="formlabel" for="hash">HASH (PLAYER ID)</label>
+        <input type="text" name="hash" value=""><br>
+        <label class="formlabel" for="callbackkey">CALLBACK KEY</label>
+        <input type="text" name="callbackkey" value=""><br>
+        <label class="formlabel" for="callbackurl">CALLBACK URL</label>
+        <input type="text" name="callbackurl" value=""><br>
+        <input id="btnsubmit" type="submit" name="inituserform" value="Create/Update Player"><br>
+        <label class="formlabel" for="inituser_cur">BACKOFFICE CURRENCY (used when Hall does not exist)</label>
+        <input type="text" name="inituser_cur" value="USD"><br>
+    </form>
+    
+    
+    <h3>Construct Game Url</h3>
+    
+    <form id="constructgameform" method="post" name="constructgameform">
+        <label class="formlabel" for="gameurl_game">GANE</label>
+        <input type="gameurl_game" name="gameurl_game" value="Hot7"><br>
+        <label class="formlabel" for="gameurl_playerhash">HASH (PLAYER ID)</label>
+        <input type="gameurl_playerhash" name="gameurl_playerhash" value=""><br>
+        <input id="btnsubmit" type="submit" name="constructgameform" value="Construct Game URL"><br>
+    </form>
+    
+    
+    
+    <h3>Hall Load/Edit</h3>
+    <button onclick="setDefaultValues('low')">Prefill form with LOW max. bet size preset</button>
+    <button onclick="setDefaultValues('normal')">Prefill form with DEFAULT bet size preset</button>
+    
+    
+    
+    <form id="edithallform" method="post" name="edithallform">
+    <label class="formlabel" for="minbet">MIN BET</label>
+    <input type="number" name="minbet" value=""><br>
+    <label class="formlabel" for="maxbet">MAX BET</label>
+    <input type="number" name="maxbet" value=""><br>
+    <label class="formlabel" for="minbet_tablegames">MIN BET TABLE GAMES</label>
+    <input type="number" name="minbet_tablegames" value=""><br>
+    <label class="formlabel" for="maxbet_tablegames">MAX BET TABLE GAMES</label>
+    <input type="number" name="maxbet_tablegames" value=""><br>
+    
+    <label class="formlabel" for="minbet_roulette">MIN BET ROULETTE</label>
+    <input type="number" name="minbet_roulette" value=""><br>
+    
+    <label class="formlabel" for="maxbet_roulette">MAX BET ROULETTE</label>
+    <input type="number" name="maxbet_roulette" value=""><br>
+    
+    
+    <label class="formlabel" for="configid">CONFIG (Game currency)</label>
+    <select name="configid" id="configidSel" autocomplete="off" required="">
+        <option value="1026">USD (id: 1026)</option>
+        <option value="1000">EUR (id: 1000)</option>
+        <option value="129">CREDITS (id: 129)</option>
+        <option value="29045">GBP (id: 29045)</option>
+        <option value="7252">CAD (id: 7252)</option>
+      </select>
+      <br>
+    
+    <label class="formlabel" for="cur">BACKOFFICE CURRENCY</label>
+    <input type="text" name="cur" value=""><br>
+    <label class="formlabel" for="rtplevel">RTP LEVEL</label>
+        <select name="rtplevel" id="rtplevelSel" autocomplete="off" required="">
+        <option value="0">85%-95%</option>
+        <option value="1">75%-85%</option>
+        <option value="2">70%-75%</option>
+        <option value="3">65%-70%</option>
+        <option value="4">60%-65%</option>
+        <option value="5">55%-60%</option>
+      </select>
+      <br>
+      <br>
+    
+    
+    <input id="btnsubmit" type="submit" name="savehall" value="Edit Hall"><br>
+    </form>
+    <form id="loadhallform" method="post" name="loadhallform">
+    <input id="btnsubmit" type="submit" name="loadhall" value="Load Hall"><br>
+    </form>
+    <script>
+    
+        // dec2hex :: Integer -> String
+    // i.e. 0-255 -> '00'-'ff'
+    function dec2hex (dec) {
+      return dec.toString(16).padStart(2, "0")
+    }
+    // generateId :: Integer -> String
+    function generatePlayerId (len) {
+      let playerIdHash = generateHash(32);
+      let callbackKeyHash = generateHash(32);
+        document.querySelector('[name="hash"]').value = playerIdHash;
+        document.querySelector('[name="callbackkey"]').value = callbackKeyHash;
+    }
+    // generateId :: Integer -> String
+    function mockbinCallbackUrl(mockbinSize) {
+        let mockbin;
+        if(mockbinSize === 1000) {
+            mockbin = 'http://mockbin.org/bin/b23c0804-bbda-4454-93cb-5613a6fd883d';
+        }
+        if(mockbinSize === 25) {
+            mockbin = 'http://mockbin.org/bin/a87408da-e8a3-4d52-9c66-54a1ad4661d5';
+        }
+        document.querySelector('[name="callbackurl"]').value = mockbin;
+    }
+    
+    
+    
+    // generateId :: Integer -> String
+    function generateHash(len) {
+      var arr = new Uint8Array((len || 40) / 2)
+      window.crypto.getRandomValues(arr)
+      return Array.from(arr, dec2hex).join('');
+    }
+    
+     function httpGet(url, get = {}, options = {}) {
+      const defaults = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Referer': 'gapi.lol',
+        },
+        timeout: 30000
+      };
+      const finalOptions = Object.assign({}, defaults, options);
+      const queryString = new URLSearchParams(get).toString();
+      let apiConstructedUrl = url + (url.indexOf('?') === -1 ? '?' : '') + queryString;
+      let corsProxyUrl = document.getElementById("gapi_corsproxy").value;
+      let finalUrl = corsProxyUrl +  encodeURIComponent(apiConstructedUrl);
+      let finalUrlDec = corsProxyUrl + apiConstructedUrl;
+      document.getElementById("apiUrlshow").value = finalUrlDec;
+      document.getElementById("responseDiv").className  = "show";
+    
+      return new Promise((resolve, reject) => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        finalOptions.signal = signal;
+        setTimeout(() => controller.abort(), finalOptions.timeout);
+        fetch(finalUrl, finalOptions)
+          .then(response => response.text())
+          .then(text => resolve(text))
+          .catch(error => reject(error));
+      });
+    
+    
+    }
+    
+    let resarray = [];
+    resarray['error'] = '';
+    
+    let defaultapi_url = 'https://play.gapi.lol/api/games/get/';
+    
+    let resjson = '';
+    function setInputToArrayValues()
+    {
+        document.querySelector('[name="minbet"]').value = resarray['minbet'];
+        document.querySelector('[name="maxbet"]').value = resarray['maxbet'];
+        document.querySelector('[name="minbet_tablegames"]').value = resarray['minbet_tablegames'];
+        document.querySelector('[name="maxbet_tablegames"]').value = resarray['maxbet_tablegames'];
+        document.querySelector('[name="minbet_roulette"]').value = resarray['minbet_roulette'];
+        document.querySelector('[name="maxbet_roulette"]').value = resarray['maxbet_roulette'];
+        document.querySelector('[name="configid"]').value = resarray['configid'];
+        document.getElementById("configidSel").value = resarray['configid'];
+        document.querySelector('[name="cur"]').value = resarray['cur'];
+        document.getElementById("rtplevelSel").value = resarray['rtplevel'];   
+    }
+    
+    function setDefaultValues(presetDefaults) {
+        if(presetDefaults === "normal") {
+            resarray['minbet'] = 5;
+            resarray['maxbet'] = 2000;
+            resarray['minbet_tablegames'] = 5;
+            resarray['maxbet_tablegames'] = 2000;
+            resarray['minbet_roulette'] = 5;
+            resarray['maxbet_roulette'] = 2000;
+            resarray['rtplevel'] = 0;
+            resarray['cur'] = "USD";
+        }
+        if(presetDefaults === "low") {
+            resarray['minbet'] = 5;
+            resarray['maxbet'] = 200;
+            resarray['minbet_tablegames'] = 5;
+            resarray['maxbet_tablegames'] = 200;
+            resarray['minbet_roulette'] = 5;
+            resarray['maxbet_roulette'] = 200;
+            resarray['rtplevel'] = 0;
+            resarray['cur'] = "USD";
+        }
+        setInputToArrayValues();
+    }
+    
+    window.onload = function() {
+        document.getElementById("gapi_api_url").value = defaultapi_url;
+    };
+    
+    
+    function retrieveParams(action) {
+        if(action === "inituser") {
+            return {
+                api_key: document.getElementById("gapi_apikey_input").value,
+                action: 'inituser',
+                cur: document.querySelector('[name="inituser_cur"]').value,
+                callbackkey: document.querySelector('[name="callbackkey"]').value,
+                callbackurl: document.querySelector('[name="callbackurl"]').value,
+                parenthash: document.getElementById("gapi_parentid_input").value,
+                hash: document.querySelector('[name="hash"]').value,
+            };
+        }
+        if(action === "edithall") {
+            return {
+                api_key: document.getElementById("gapi_apikey_input").value,
+                action: 'edithall',
+                minbet: document.querySelector('[name="minbet"]').value,
+                maxbet: document.querySelector('[name="maxbet"]').value,
+                minbet_tablegames: document.querySelector('[name="minbet_tablegames"]').value,
+                maxbet_tablegames: document.querySelector('[name="maxbet_tablegames"]').value,
+                minbet_roulette: document.querySelector('[name="minbet_roulette"]').value,
+                maxbet_roulette: document.querySelector('[name="maxbet_roulette"]').value,
+                rtplevel: document.getElementById("rtplevelSel").value,
+                configid: document.querySelector('[name="configid"]').value,
+                cur: document.querySelector('[name="cur"]').value,
+                parenthash: document.getElementById("gapi_parentid_input").value
+            };
+        }
+        if(action === "loadhall") {
+            return {
+                api_key: document.getElementById("gapi_apikey_input").value,
+                action: 'edithall',
+                parenthash: document.getElementById("gapi_parentid_input").value
+             };
+        }
+    
+    
+    }
+    
+    document.querySelector('#constructgameform').addEventListener('submit', event => {
+        event.preventDefault();
+        let constructGameUrl = 'https://play.gapi.lol/play/?game='+(document.querySelector('[name="gameurl_game"]').value)+'&hash='+(document.querySelector('[name="gameurl_playerhash"]').value)+'&api_id='+(document.getElementById("gapi_public_apikey_input").value)+'&lang=en&exit=back.html';
+        document.getElementById("apiUrlshow").value = constructGameUrl;
+        document.getElementById("jsonInput").value = constructGameUrl;
+    });
+    
+    
+    
+    document.querySelector('#inituserform').addEventListener('submit', event => {
+        event.preventDefault();
+        let inituserParams = retrieveParams("inituser");
+        httpGet(document.getElementById("gapi_api_url").value, inituserParams)
+                .then(response => {
+                resjson = response;
+                document.getElementById("jsonInput").value = resjson;
+                })
+                .catch(error => document.getElementById("jsonInput").value = error);
+    
+    });
+    
+      document.querySelector('#edithallform').addEventListener('submit', event => {
+        event.preventDefault();
+        let editHallparams = retrieveParams("edithall");
+      if(editHallparams.maxbet < 199 || editHallparams.maxbet_tablegames < 199 || editHallparams.maxbet_roulette < 199) {
+        alert("Error: Max bet needs to be over 200+.");
+        return;
+      }
+      if(editHallparams.minbet < 4 || editHallparams.minbet_tablegames < 4 || editHallparams.minbet_roulette < 4) {
+        alert("Error: Min bet needs to be 5+.");
+        return;
+      }
+    
+    
+      httpGet(document.getElementById("gapi_api_url").value, editHallparams)
+        .then(response => {
+          resjson = response;
+          resarray = JSON.parse(resjson);
+          document.getElementById("jsonInput").value = resjson;
+          setInputToArrayValues();
+        })
+        .catch(error => document.getElementById("jsonInput").value = error);
+        });
+    
+        document.querySelector('#loadhallform').addEventListener('submit', event => {
+            event.preventDefault();
+            document.getElementById("responseDiv").className  = "hidden";
+            let loadHallparams = retrieveParams("loadhall");
+            httpGet(document.getElementById("gapi_api_url").value, loadHallparams)
+                .then(response => {
+                resjson = response;
+                resarray = JSON.parse(resjson);
+                document.getElementById("jsonInput").value = resjson;
+                setInputToArrayValues();
+                })
+                .catch(error => document.getElementById("jsonInput").value = error);
+      });
+    </script>
+    
+    
+    </body></html>
