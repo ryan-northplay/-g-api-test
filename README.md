@@ -33,7 +33,7 @@ Idea was to transition the standalone client into this next.js system just don't
 - You can set start balances for non existing users in advance (test only), by specifying the securekey in your GAPI API ledger (inituser), for example currently it's set to `TEST_STARBAL-[insert amount here]`, so if you want non existing user when receiving first callback from GAPI to start with 25.00 $(credits) as balance you put: `TEST_STARBAL-25`. The maximum currently it's set on 25, so you can do `TEST_STARBAL-4` for start with 4(credits) and so forth.
 
 
-When specifying the "callbackurl" enter host of whereever you host this + "/api/cb.ts", like `https://localhost/api/cb`
+- When specifying the "callbackurl" enter host of whereever you host this + "/api/cb.ts", like `https://localhost/api/cb`
 
 - Games overview (was gonna build it out a bit more)
 
